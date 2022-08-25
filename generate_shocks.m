@@ -2,7 +2,8 @@
 %% Thus, there is nothing to do with the authors' datasets. This script only uses Data >> "romer" data.
 %% Generate the first day in the subsequent quarter then subtract one day from it
 %% Let's see if this shows up on Ray's github!!!
-%% hmmm
+%% hmmm need to view and commit changes to push again.
+%% Otherwise, the push button is not clickable.
 
 %hsk% Data construction need to be done beforehand
 settings.sample0 = startS:1:endS; 
