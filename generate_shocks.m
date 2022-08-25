@@ -1,7 +1,7 @@
 %% This script generates Romer&Romer shock (both linearly and non-linearly) 
 %% Thus, there is nothing to do with the authors' datasets. This script only uses Data >> "romer" data.
 %% Generate the first day in the subsequent quarter then subtract one day from it
-%% Let's see if this shows up on Ray's github!!!
+%% This is an annotated version of generate_shocks.m
 %% hmmm need to view and commit changes to push again.
 %% Otherwise, the push button is not clickable.
 %% Also, need to log-in everytime with personal token. There should be a way to get around this.
