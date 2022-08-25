@@ -1,3 +1,5 @@
+%POC to make sure we can modify and track changes to MATLAB via VS Code and then upload the modifications onto Github
+
 startS=89;  %
 endS=224;
 samplelength=endS-startS+1; % Sample period - dates of shocks - need to ensure data runs L periods earlier and H periods later
