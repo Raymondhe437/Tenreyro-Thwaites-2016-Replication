@@ -4,6 +4,7 @@
 %% Let's see if this shows up on Ray's github!!!
 %% hmmm need to view and commit changes to push again.
 %% Otherwise, the push button is not clickable.
+%% Also, need to log-in everytime with personal token. There should be a way to get around this.
 
 %hsk% Data construction need to be done beforehand
 settings.sample0 = startS:1:endS; 
