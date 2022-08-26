@@ -171,7 +171,7 @@ for n=1:N; % loop over LHS variables
     results(n).lin.res=res;
     results(n).lin.betafull=betafull;
     
-    if runstate==1;
+    if runstate==1
         results(n).NL.betaNL=betaNL;
         results(n).NL.res=resNL;            
         results(n).NL.betafullNL=betafullNL;
@@ -186,7 +186,7 @@ for n=1:N; % loop over LHS variables
         results(n).lin.smoothed.coef=weight*results(n).lin.beta/betaR(1); % Scale by first period impact on Fed Funds
         results(n).lin.cum.coef=cumweight*results(n).lin.beta/betaR(1);
 
-        if runstate==1;
+        if runstate==1
             results(n).NL.scaled.coef(:,1)=results(n).NL.betaNL(:,1)/betaRNL(1);
             results(n).NL.scaled.coef(:,2)=results(n).NL.betaNL(:,2)/betaRNL(2);
             results(n).NL.scaled.coef_diff=results(n).NL.scaled.coef(:,1)-results(n).NL.scaled.coef(:,2);
@@ -203,6 +203,6 @@ for n=1:N; % loop over LHS variables
     
 end
 %display('Estimation complete')
-
+%hsk% Dani is smart
 end
 
