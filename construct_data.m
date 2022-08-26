@@ -5,7 +5,7 @@ endS=224;
 samplelength=endS-startS+1; % Sample period - dates of shocks - need to ensure data runs L periods earlier and H periods later
 
 % Import the data
-[~, ~, raw] = xlsread('C:\Users\HUSANG KIM\Desktop\Papers\3. MPU&MPP\6. Local_Projection_MATLAB\data.xlsx','Policy','A2:A255');
+[~, ~, raw] = xlsread('data.xlsx','Policy','A2:A255');
 %hsk% ~ seems like a filler to fill arguments inside [ ]
 %hsk% [num, txt, raw] = xlsread(filename, sheet, cellrange)
 %hsk% num: only stores numeric values from the excel file
@@ -35,7 +35,7 @@ FFR = reshape([raw{:}],size(raw));
 %% Clear temporary variables
 clearvars raw R;
 
-[~, ~, raw] = xlsread('C:\Users\HUSANG KIM\Desktop\Papers\3. MPU&MPP\6. Local_Projection_MATLAB\data.xlsx','Shocks','A2:B255');
+[~, ~, raw] = xlsread('data.xlsx','Shocks','A2:B255');
 raw(cellfun(@(x) ~isempty(x) && isnumeric(x) && isnan(x),raw)) = {''};
 
 %% Replace non-numeric cells with NaN
@@ -48,7 +48,7 @@ E = reshape([raw{:}],size(raw));
 %% Clear temporary variables
 clearvars raw R;
 
-[~, ~, raw] = xlsread('C:\Users\HUSANG KIM\Desktop\Papers\3. MPU&MPP\6. Local_Projection_MATLAB\data.xlsx','alt_states','A2:D255');
+[~, ~, raw] = xlsread('data.xlsx','alt_states','A2:D255');
 raw(cellfun(@(x) ~isempty(x) && isnumeric(x) && isnan(x),raw)) = {''};
 
 %% Replace non-numeric cells with NaN
@@ -62,7 +62,7 @@ alt_states = reshape([raw{:}],size(raw));
 clearvars raw R;
 
 %% Import the data
-[~, ~, raw] = xlsread('C:\Users\HUSANG KIM\Desktop\Papers\3. MPU&MPP\6. Local_Projection_MATLAB\data.xlsx','LHS','A2:AM255');
+[~, ~, raw] = xlsread('data.xlsx','LHS','A2:AM255');
 raw(cellfun(@(x) ~isempty(x) && isnumeric(x) && isnan(x),raw)) = {''};
 
 %% Replace non-numeric cells with NaN
@@ -78,7 +78,7 @@ LHS = LHS(:,2:end);
 clearvars raw R;
 
 R=FFR;                      % Policy variable being instrumented
-[~, ~, names] = xlsread('C:\Users\HUSANG KIM\Desktop\Papers\3. MPU&MPP\6. Local_Projection_MATLAB\data.xlsx','LHS','B1:AM1');
+[~, ~, names] = xlsread('data.xlsx','LHS','B1:AM1');
 names(cellfun(@(x) ~isempty(x) && isnumeric(x) && isnan(x),names)) = {''};
 
 save data.mat %R E LHS alt_states names dates startS endS samplelength
