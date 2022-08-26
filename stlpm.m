@@ -1,11 +1,22 @@
 function [results]=stlpm(R,E,M,LHS,trend,Xlags,Rlags,runstate,includetrend,useNLshocks,H,CI,startS,endS,scaling,weight,cumweight)
+
+%hsk% Spits out a structure "results" with 13 sub-structures inside.
+% 13 substructures = 12 explanatory variables + 1 policy rates (ffr)
+% footnote 4 says "In the baseline specification, X_t contains one lag each of the dependent variable and federal funds rate."
+% But when ffr itself is dependent variable, not X_t just contains one lag of ffr. - This is done first. 
+
+%E = shocksandstates(1).E;
+%M = shocksandstates(1).M_Z_t;
+
+
+
 % estimates an STLPM as a function
 
 % set up regression matrices
-N=size(LHS,2);              % Number of endogenous variables
+N=size(LHS,2);              % Number of endogenous variables = 12
 XR=[];
 if Rlags>0
-    XR=R(startS-1:endS-1);
+    XR=R(startS-1:endS-1); 
     if Rlags>1
         for l=2:Rlags
             XR=[XR R(startS-l:endS-l)]; %   lagged interest rates                                                                
@@ -13,18 +24,24 @@ if Rlags>0
     end
 end
 
-XR=[ones(length(XR),1) XR E(:,1)];   % construct common RHS projection matrix
+%hsk% R is interest rates. XR is a subset of interest rates for the sample period.
+%hsk% E is two series of shocks. Linear and Non-linear,
+
+XR=[ones(length(XR),1) XR E(:,1)];   % construct common RHS projection matrix using linear shock.
 if includetrend==1
     XR=[trend XR];
 end
-XRproj=inv(XR'*XR)*XR';
-KR=size(XR,2);
+%hsk% XR consists of (trend, intercept, interest rates, linear shocks)
 
+XRproj=inv(XR'*XR)*XR'; %hsk% not exactly projection matrix. But used to calculate coefficient later
+KR=size(XR,2); %hsk% Number of variables in XRproj
+
+%hsk% Setting up non-linear projection matrix.
 if runstate==1;
 
     if useNLshocks==0
         XRNL=[repmat(M,[1 size(XR(:,1+includetrend:end),2)]).*XR(:,1+includetrend:end) (1-repmat(M,[1 size(XR(:,1+includetrend:end),2)])).*XR(:,1+includetrend:end)];
-    else
+    else %hsk% defualt is NLshocks == 1, M is probability of expansion for each FOMC meeting. This is just [F(z_t)X_t, (1-F(z_{t}))X_{t}] but X_{t} excludes time trend. 
         XRNL=[repmat(M,[1 size(XR(:,1+includetrend:end),2)]).*[XR(:,1+includetrend:end-1) E(:,2)] (1-repmat(M,[1 size(XR(:,1+includetrend:end),2)])).*[XR(:,1+includetrend:end-1) E(:,2)]];
     end
     if includetrend==1
@@ -37,9 +54,11 @@ if runstate==1;
 end
 
 %% Main regression loop
-% loop over H, store coefficients and residuals
 
-% policy variable regressions
+% loop over H, store coefficients and residuals
+% policy variable regressions 
+%hsk% dependent variable is ffr
+
 betaR=[];
 resR=[];
 betafull=[];
@@ -47,14 +66,13 @@ betafullNL=[];
 betaRNL=zeros(H+1,2);
 resRNL=[];
 for h=0:H
-
-    betaRh=XRproj*R(startS+h:endS+h);
+    betaRh=XRproj*R(startS+h:endS+h); %teporary storage of beta_{t+h}%
     results(N+1).lin.betafull=betaRh;
-    betaR=[betaR; betaRh(end)];
-    betafull(:,h+1)=betaRh;
-    resRh=R(startS+h:endS+h)-XR*betaRh;
+    betaR=[betaR; betaRh(end)]; %store response to the shock%
+    betafull(:,h+1)=betaRh; %need to add 1 because there is no column with index 0%
+    resRh=R(startS+h:endS+h)-XR*betaRh; %extract residual - maybe used for inference.%
     resR(:,h+1)=resRh;
-%    results(N+1).lin.variance(:,:,h+1)=var(resR(:,h+1))*inv(XR'*XR);
+    results(N+1).lin.variance(:,:,h+1)=var(resR(:,h+1))*inv(XR'*XR);
     
     if runstate==1
         betaRhNL=XRNLproj*R(startS+h:endS+h);
@@ -63,7 +81,7 @@ for h=0:H
         betaRNL(h+1,2)=betaRhNL(end);
         resRhNL=R(startS+h:endS+h)-XRNL*betaRhNL;
         resRNL(:,h+1)=resRhNL;
-%        results(N+1).NL.variance(:,:,h+1)=var(resRNL(:,h+1))*inv(XRNL'*XRNL);
+        results(N+1).NL.variance(:,:,h+1)=var(resRNL(:,h+1))*inv(XRNL'*XRNL);
     end
     
 end
@@ -99,8 +117,9 @@ if scaling==1
 end
 
 % response variable regressions
+%hsk% 12 other dependent variables. The only difference from above is there is one more explanatory variable, ffr.
 for n=1:N; % loop over LHS variables
-    
+    %n = 1; %hsk% GDP volume
     results(N+1).lin.beta=[];
     res=[];
     X=[];
@@ -108,8 +127,8 @@ for n=1:N; % loop over LHS variables
     betafull=[];
     betafullNL=[];
     
-    if Xlags>0
-        X=LHS(startS-1:endS-1,n);
+    if Xlags>0 %hsk% default is 1.
+        X=LHS(startS-1:endS-1,n); %hsk% One lag of each dependenet variable (see footnote 4)
         if Xlags>1
             for l=2:Xlags
                 X=[X LHS(startS-l:endS-l,n)];
@@ -119,8 +138,8 @@ for n=1:N; % loop over LHS variables
 %    X2=X;
     if includetrend==0
         X=[X XR]; 
-    else
-        X=[trend X XR(:,2:end)];
+    else %hsk% default is includetrend == 1
+        X=[trend X XR(:,2:end)]; %hsk% X consists of (trend, lagged GDP volume (if n =1), interest rates, linear shocks)
     end
     results(n).lin.X=X;
     Xproj=inv(X'*X)*X';
@@ -144,13 +163,13 @@ for n=1:N; % loop over LHS variables
     end 
     KNL=size(XNL,2);
     recshockindex=KNL;
-    boomshockindex=KNL-(KNL-includetrend)/2;
+    boomshockindex=KNL-(KNL-includetrend)/2; %hsk% Index that indicates the shock column?
     
     % loop over H, store coefficients and residuals
     for h=0:H
-        betah=Xproj*LHS(startS+h:endS+h,n);
-        betafull(:,h+1)=betah;
-        beta=[beta; betah(end)];
+        betah=Xproj*LHS(startS+h:endS+h,n); %hsk% (n=1) Regress GDP Volume on (trend, lagged GDP volume (if n =1), interest rates, linear shocks).
+        betafull(:,h+1)=betah; %hsk% need to +1 because h = 0 cannot be used as a column index.
+        beta=[beta; betah(end)]; %hsk% store response to shock
         resh=LHS(startS+h:endS+h,n)-X*betah;
         res(:,h+1)=resh;
 %        results(n).lin.variance(:,:,h+1)=var(resR(:,h+1))*inv(XR'*XR);
