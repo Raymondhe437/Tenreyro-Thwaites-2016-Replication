@@ -18,9 +18,6 @@ datestring=datenum(floor(dates(startS:endS)),3+12*(dates(startS:endS)-floor(date
 %1 indicates the first dat.
 %datestring is an array of dates in general number format.
 
-%Hi hello how are you????
-%my name is Suryansh
-
 
 for i=1:length(datestring)
     datestring(i)=addtodate(addtodate(datestring(i),1,'month'),-1,'day');
