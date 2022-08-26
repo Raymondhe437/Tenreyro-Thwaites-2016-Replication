@@ -2,10 +2,10 @@ function [results]=stlpm(R,E,M,LHS,trend,Xlags,Rlags,runstate,includetrend,useNL
 % estimates an STLPM as a function
 
 % set up regression matrices
-N=size(LHS,2);              % Number of endogenous variables
+N=size(LHS,2);              % Number of endogenous variables     %su% why 2?
 XR=[];
-if Rlags>0
-    XR=R(startS-1:endS-1);
+if Rlags>0                  %su% What is Rlags? input in the function 'results'
+    XR=R(startS-1:endS-1);  %su% What is XR?
     if Rlags>1
         for l=2:Rlags
             XR=[XR R(startS-l:endS-l)]; %   lagged interest rates                                                                
