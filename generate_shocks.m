@@ -31,7 +31,7 @@ test=datestr(datestring);
 %hsk% The date length is equivalent to Data > "Romer"
 %hsk% test variable is used in the main script.
 %% Import the data, extracting spreadsheet dates in MATLAB serial date number format (datenum)
-[~, ~, raw, dateNums] = xlsread('C:\Users\HUSANG KIM\Desktop\Papers\3. MPU&MPP\6. Local_Projection_MATLAB\data.xlsx','romer','A2:U352','',@convertSpreadsheetDates);
+[~, ~, raw, dateNums] = xlsread('data.xlsx','romer','A2:U352','',@convertSpreadsheetDates);
 %hsk% The only difference b/w raw and dateNums is how the date column (from Data > Romer) is formatted
 %hsk% The ~ represents the discarded outputs from function xlsread.
 
