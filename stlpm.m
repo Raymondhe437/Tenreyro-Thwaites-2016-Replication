@@ -58,6 +58,8 @@ end
 % loop over H, store coefficients and residuals
 % policy variable regressions 
 %hsk% dependent variable is ffr
+%daf% So one set of regressions is run for every set of lags h. However,
+%daf% The other set of regressions is only performed when runstate is 1.
 
 betaR=[];
 resR=[];
@@ -83,7 +85,9 @@ for h=0:H
         resRNL(:,h+1)=resRhNL;
         results(N+1).NL.variance(:,:,h+1)=var(resRNL(:,h+1))*inv(XRNL'*XRNL);
     end
-    
+
+%daf% This is getting the fitted estimates and residuals across both states
+
 end
 results(N+1).lin.res=resR;
 results(N+1).lin.beta=betaR;
@@ -95,6 +99,9 @@ if runstate==1
     results(N+1).NL.betafullNL=betafullNL;
     results(N+1).NL.XRNL=XRNL;
 end
+
+%daf% This is only run if scaling is chosen. Then the coefficients are weighted by
+%daf% first period impact of Fed Funds, which seems to be called "weight".
 
 if scaling==1
     results(N+1).lin.scaled.coef=betaR/betaR(1); % Scale by first period impact on Fed Funds
@@ -151,6 +158,9 @@ for n=1:N; % loop over LHS variables
     XNL=[];
     betaNL=[];
     betaNL=zeros(H+1,2);
+    %daf% if a trend is included, then it is made the initial column of XNL, with
+    %daf% apparently some repositioning of the other (repeated) columns to drop
+    %daf% their first columns with "2:end", which drops the 1st col?
     if runstate==1;
 %        XNL=[M.*X2 (1-M).*X2 XRNL];
         if includetrend==0
@@ -201,6 +211,7 @@ for n=1:N; % loop over LHS variables
     % Construct smoothed and cumulative scaled IRFs
     % matrix of weights for the moving average process
     % Linear model MAs and CIs
+    %daf% It looks like this is a preparation of the creation of CIs (coef difference)
         results(n).lin.scaled.coef=results(n).lin.beta/betaR(1); % Scale by first period impact on Fed Funds
         results(n).lin.smoothed.coef=weight*results(n).lin.beta/betaR(1); % Scale by first period impact on Fed Funds
         results(n).lin.cum.coef=cumweight*results(n).lin.beta/betaR(1);
@@ -209,10 +220,14 @@ for n=1:N; % loop over LHS variables
             results(n).NL.scaled.coef(:,1)=results(n).NL.betaNL(:,1)/betaRNL(1);
             results(n).NL.scaled.coef(:,2)=results(n).NL.betaNL(:,2)/betaRNL(2);
             results(n).NL.scaled.coef_diff=results(n).NL.scaled.coef(:,1)-results(n).NL.scaled.coef(:,2);
-
+            
+            %daf% smoothed is just scaled times weight
+            
             results(n).NL.smoothed.coef(:,1)=weight*results(n).NL.scaled.coef(:,1);
             results(n).NL.smoothed.coef(:,2)=weight*results(n).NL.scaled.coef(:,2);
             results(n).NL.smoothed.coef_diff=results(n).NL.smoothed.coef(:,1)-results(n).NL.smoothed.coef(:,2);
+            
+            %daf% cum is just scaled times cumulative weight
 
             results(n).NL.cum.coef(:,1)=cumweight*results(n).NL.scaled.coef(:,1);
             results(n).NL.cum.coef(:,2)=cumweight*results(n).NL.scaled.coef(:,2);        
